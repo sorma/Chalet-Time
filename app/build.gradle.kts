@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.francesco.chalettime"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.francesco.chalettime"
