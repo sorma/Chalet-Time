@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">ChaletTime</string>
+    <string name="welcome">Welcome!</string>
+    <string name="already_registered">Are you already registered?</string>
+    <string name="background_login">Background login fragment</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
 </resources>
