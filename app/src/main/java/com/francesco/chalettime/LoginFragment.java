@@ -1,5 +1,6 @@
 package com.francesco.chalettime;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -43,17 +44,24 @@ public class LoginFragment extends Fragment {
         editTextPassword = view.findViewById(R.id.password);
 
         Button loginButton = view.findViewById(R.id.login_button);
-
         loginButton.setOnClickListener(v -> {
             if(isUsernameOk(editTextUsername.toString())){
                 if(isPasswordOk(editTextPassword.toString())){
-                    Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_mainActivity);
+                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    getActivity().finish();
                 } else{
                     editTextPassword.setError("Insert the correct password");
                 }
             } else{
                 editTextUsername.setError("Insert the correct username");
             }
+        });
+
+        Button textbutton = view.findViewById(R.id.textButton);
+        textbutton.setOnClickListener(v -> {
+            Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_registerFragment);
         });
 
     }

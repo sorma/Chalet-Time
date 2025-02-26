@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:text="@string/already_registered"/>
+        android:text="@string/do_you_want_to_register"/>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
@@ -72,6 +72,19 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+
+    <Button
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:id="@+id/register_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin"
+        android:layout_marginStart="@dimen/margin_button"
+        android:layout_marginEnd="@dimen/margin_button"
+        android:text="@string/register"
+        android:layout_gravity="center"
+        />
+
     <Button
         android:id="@+id/textButton"
         style="@style/Widget.Material3.Button.TextButton"
@@ -80,18 +93,6 @@
         android:layout_gravity="start"
         android:layout_marginStart="@dimen/margin"
         android:layout_marginEnd="@dimen/margin"
-        android:text="@string/you_are_not_registered_yet" />
-
-    <Button
-        style="@style/Widget.Material3.Button.TonalButton"
-        android:id="@+id/login_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin"
-        android:layout_marginStart="@dimen/margin_button"
-        android:layout_marginEnd="@dimen/margin_button"
-        android:text="@string/login"
-        android:layout_gravity="center"
-        />
+        android:text="@string/back_to_login" />
 
 </LinearLayout>
