@@ -60,9 +60,7 @@ public class LoginFragment extends Fragment {
         });
 
         Button textbutton = view.findViewById(R.id.textButton);
-        textbutton.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_registerFragment);
-        });
+        textbutton.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_registerFragment));
 
     }
 
