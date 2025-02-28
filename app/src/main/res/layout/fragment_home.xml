@@ -35,6 +35,7 @@
         android:id="@+id/date_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:focusable="true"
         android:hint="@string/select_date"
         android:layout_marginStart="@dimen/margin"
         android:layout_marginEnd="@dimen/margin"

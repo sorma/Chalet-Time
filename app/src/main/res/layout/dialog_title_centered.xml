@@ -5,14 +5,15 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:background="@color/md_theme_secondary">
 
     <TextView
         android:id="@+id/dialog_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Seleziona ore"
-        android:textSize="18sp"
-        android:textColor="@android:color/black"
+        android:text="@string/seleziona_ore"
+        android:textSize="25sp"
+        android:textColor="@android:color/white"
         android:textStyle="bold" />
 </LinearLayout>

@@ -15,7 +15,9 @@
     <string name="do_you_want_to_register">Do you want to register?</string>
     <string name="register">Register</string>
     <string name="back_to_login">Back to login</string>
-    <string name="annulla">Annulla</string>
-    <string name="reset">Reset</string>
+    <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
+    <string name="name">Name</string>
+    <string name="surname">Surname</string>
+    <string name="seleziona_ore">Seleziona ore</string>
 </resources>

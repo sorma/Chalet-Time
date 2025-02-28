@@ -2,6 +2,7 @@ package com.francesco.chalettime;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
+import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
@@ -18,18 +19,19 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 public class HomeFragment extends Fragment {
@@ -81,7 +83,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        dateInputLayout.setEndIconVisible(!TextUtils.isEmpty(hourEditText.getText()));
+        dateInputLayout.setEndIconVisible(!TextUtils.isEmpty(dateEditText.getText()));
 
         dateEditText.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
@@ -109,6 +111,7 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -155,43 +158,54 @@ public class HomeFragment extends Fragment {
             Button cancelButton = dialogView.findViewById(R.id.negativeButton);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-            @SuppressLint("InflateParams") View titleView = getLayoutInflater().inflate(R.layout.dialog_title_centered, null);
+            @SuppressLint("InflateParams")
+            View titleView = getLayoutInflater().inflate(R.layout.dialog_title_centered, null);
+            TextView titleTextView = titleView.findViewById(R.id.dialog_title);
             builder.setCustomTitle(titleView);
             builder.setView(dialogView);
             builder.setCancelable(false);
 
             AlertDialog dialog = builder.create();
             dialog.show();
-            WindowManager.LayoutParams params = Objects.requireNonNull(dialog.getWindow()).getAttributes();
-            params.width = WindowManager.LayoutParams.MATCH_PARENT;
-            params.height = (int) (getResources().getDisplayMetrics().heightPixels * 0.5);
-            dialog.getWindow().setAttributes(params);
+
             dialogGridView.setAdapter(adapter);
-            final int[] selectedPosition = {-1};
+
+            final int[] selectedPosition = {-1}; 
             dialogGridView.setOnItemClickListener((parent, view1, position, id) -> {
                 selectedPosition[0] = position;
+                String selectedOption = options.get(position);
 
-                for (int i = 0; i < parent.getCount(); i++) {
+                titleTextView.setText("Hour selected: " + selectedOption);
+
+                for (int i = 0; i < parent.getChildCount(); i++) {
                     View itemView = parent.getChildAt(i);
                     if (itemView != null) {
+                        TextView numberText = itemView.findViewById(R.id.numberText);
                         if (i == position) {
-                            itemView.setBackgroundColor(getResources().getColor(R.color.md_theme_primary));
+                            numberText.setSelected(true);
+                            numberText.setTextColor(Color.WHITE);
+                            itemView.setBackgroundResource(R.drawable.circle_selector);
                         } else {
-                            itemView.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                            numberText.setSelected(false);
+                            numberText.setTextColor(Color.BLACK);
+                            itemView.setBackgroundResource(R.drawable.circle_selector);
                         }
                     }
                 }
+            });
 
-                okButton.setOnClickListener(v1 -> {
-                    dialog.dismiss();
-                    String selectedOption = options.get(position);
+            okButton.setOnClickListener(v1 -> {
+                if (selectedPosition[0] != -1) {
+                    String selectedOption = options.get(selectedPosition[0]);
                     hourEditText.setText(selectedOption);
-                });
+                    dialog.dismiss();
+                }
             });
 
-            cancelButton.setOnClickListener(v1 -> {
-                dialog.dismiss();
-            });
+            cancelButton.setOnClickListener(v1 -> dialog.dismiss());
         });
+
+
+
     }
 }
