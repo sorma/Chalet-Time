@@ -34,16 +34,16 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/username"
+        android:hint="@string/e_mail"
         android:layout_marginStart="@dimen/margin"
         android:layout_marginEnd="@dimen/margin"
         android:layout_marginTop="@dimen/margin"
         style="?attr/textInputFilledStyle"
-        app:startIconDrawable="@drawable/username"
+        app:startIconDrawable="@drawable/e_mail"
         >
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/username"
+            android:id="@+id/e_mail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 

@@ -2,4 +2,9 @@
 <resources>
     <dimen name="margin">16dp</dimen>
     <dimen name="margin_button">50dp</dimen>
+    <dimen name="margin_recycler_grid" >5dp</dimen>
+    <dimen name="padding">16dp</dimen>
+    <dimen name="padding_grid">10dp</dimen>
+    <dimen name="item_border">15dp</dimen>
+    <dimen name="margin_image">10dp</dimen>
 </resources>

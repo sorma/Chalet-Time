@@ -20,15 +20,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-
+import android.widget.Toast;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-
+import com.google.firebase.auth.FirebaseAuth;
 
 public class RegisterFragment extends Fragment {
 
-    private TextInputEditText editTextUsername;
+    private TextInputEditText editTextEmail;
     private TextInputEditText editTextPassword;
+    FirebaseAuth mAuth;
 
 
     public RegisterFragment() {
@@ -82,7 +83,6 @@ public class RegisterFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         Calendar calendar = Calendar.getInstance();
-        EditText hourEditText = view.findViewById(R.id.hour);
         EditText dateEditText = view.findViewById(R.id.date);
 
         dateEditText.setOnClickListener(v -> {
@@ -107,35 +107,33 @@ public class RegisterFragment extends Fragment {
             datePickerDialog.show();
         });
 
-        editTextUsername = view.findViewById(R.id.username);
+        editTextEmail = view.findViewById(R.id.e_mail);
         editTextPassword = view.findViewById(R.id.password);
+        mAuth = FirebaseAuth.getInstance();
 
         Button registerButton = view.findViewById(R.id.register_button);
         registerButton.setOnClickListener(v -> {
-            if(isUsernameOk(editTextUsername.toString())){
-                if(isPasswordOk(editTextPassword.toString())){
-                    Intent intent = new Intent(getActivity(), MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    getActivity().finish();
-                } else{
-                    editTextPassword.setError("Insert the correct password");
-                }
-            } else{
-                editTextUsername.setError("Insert the correct username");
-            }
+            String email, password;
+            email = String.valueOf(editTextEmail.getText());
+            password = String.valueOf(editTextPassword.getText());
+
+            mAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getContext(), "Account created", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getContext(), MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                        } else {
+                            Toast.makeText(getContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
         });
 
         Button textbutton = view.findViewById(R.id.textButton);
         textbutton.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.action_registerFragment_to_loginFragment));
     }
 
-    private boolean isUsernameOk(String email){
-        //Controlli con il database che l'username inserito esista
-        return true;
-    }
-    private boolean isPasswordOk(String password){
-        //Controlli che la password corrisponda all'username inserito
-        return true;
-    }
+
 }

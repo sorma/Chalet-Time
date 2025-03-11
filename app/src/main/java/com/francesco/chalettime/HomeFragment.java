@@ -2,7 +2,6 @@ package com.francesco.chalettime;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
-import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
@@ -12,20 +11,18 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
-
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -108,6 +105,8 @@ public class HomeFragment extends Fragment {
             }
         });
 
+
+
         return view;
     }
 
@@ -151,15 +150,18 @@ public class HomeFragment extends Fragment {
                 }
             }
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.grid_item, R.id.numberText, options);
-            View dialogView = getLayoutInflater().inflate(R.layout.dialog_hours_body, null);
+            CustomGridAdapter adapter = new CustomGridAdapter(requireContext(), options);
+
+            LayoutInflater inflater = getLayoutInflater();
+            @SuppressLint("InflateParams")
+            View dialogView = inflater.inflate(R.layout.dialog_hours_body, null);
             GridView dialogGridView = dialogView.findViewById(R.id.gridView);
             Button okButton = dialogView.findViewById(R.id.okButton);
             Button cancelButton = dialogView.findViewById(R.id.negativeButton);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             @SuppressLint("InflateParams")
-            View titleView = getLayoutInflater().inflate(R.layout.dialog_title_centered, null);
+            View titleView = inflater.inflate(R.layout.dialog_title_centered, null);
             TextView titleTextView = titleView.findViewById(R.id.dialog_title);
             builder.setCustomTitle(titleView);
             builder.setView(dialogView);
@@ -170,35 +172,21 @@ public class HomeFragment extends Fragment {
 
             dialogGridView.setAdapter(adapter);
 
-            final int[] selectedPosition = {-1}; 
-            dialogGridView.setOnItemClickListener((parent, view1, position, id) -> {
-                selectedPosition[0] = position;
+            dialogGridView.setOnItemClickListener((parent, a, position, id) -> {
                 String selectedOption = options.get(position);
-
-                titleTextView.setText("Hour selected: " + selectedOption);
-
-                for (int i = 0; i < parent.getChildCount(); i++) {
-                    View itemView = parent.getChildAt(i);
-                    if (itemView != null) {
-                        TextView numberText = itemView.findViewById(R.id.numberText);
-                        if (i == position) {
-                            numberText.setSelected(true);
-                            numberText.setTextColor(Color.WHITE);
-                            itemView.setBackgroundResource(R.drawable.circle_selector);
-                        } else {
-                            numberText.setSelected(false);
-                            numberText.setTextColor(Color.BLACK);
-                            itemView.setBackgroundResource(R.drawable.circle_selector);
-                        }
-                    }
-                }
+                titleTextView.setText("Selected: " + selectedOption);
+                adapter.setSelectedPosition(position);
             });
 
+
             okButton.setOnClickListener(v1 -> {
-                if (selectedPosition[0] != -1) {
-                    String selectedOption = options.get(selectedPosition[0]);
+                int selectedPos = adapter.getSelectedPosition();
+                if (selectedPos != -1) {
+                    String selectedOption = options.get(selectedPos);
                     hourEditText.setText(selectedOption);
                     dialog.dismiss();
+                } else {
+                    Toast.makeText(requireContext(), "Seleziona un'ora prima di confermare", Toast.LENGTH_SHORT).show();
                 }
             });
 
