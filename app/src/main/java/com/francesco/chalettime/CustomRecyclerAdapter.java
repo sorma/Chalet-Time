@@ -1,5 +1,6 @@
 package com.francesco.chalettime;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +36,7 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
         holder.hourView.setText(user.getHours());
         holder.nameView.setText(user.getName());
         holder.imageView.setImageResource(user.getImage());
+        holder.birthadayView.setText(user.getBirthday());
     }
 
     @Override
@@ -42,15 +44,22 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
         return userList.size();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateList(List<Recycler_item> newList) {
+        this.userList = newList;
+        notifyDataSetChanged();
+    }
+
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
-        TextView nameView, hourView;
+        TextView nameView, hourView, birthadayView;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
             nameView = itemView.findViewById(R.id.name);
             hourView = itemView.findViewById(R.id.hour);
+            birthadayView = itemView.findViewById(R.id.birthday);
         }
     }
 }

@@ -4,11 +4,21 @@ public class Recycler_item {
     String name;
     String hours;
     int image;
+    String birthday;
 
-    public Recycler_item(String name, String hours, int image) {
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+    public Recycler_item(String name, String hours, int image, String birthday) {
         this.image = image;
         this.hours = hours;
         this.name = name;
+        this.birthday = birthday;
     }
 
     public String getName() {

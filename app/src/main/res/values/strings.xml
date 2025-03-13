@@ -19,4 +19,5 @@
     <string name="name">Name</string>
     <string name="surname">Surname</string>
     <string name="seleziona_ore">Selected hours</string>
+    <string name="selected_gender">Selected gender</string>
 </resources>

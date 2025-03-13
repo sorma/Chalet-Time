@@ -14,18 +14,20 @@ import androidx.fragment.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,6 @@ public class HomeFragment extends Fragment {
 
 
     public HomeFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -194,6 +195,49 @@ public class HomeFragment extends Fragment {
         });
 
 
+        Button confirmButton = view.findViewById(R.id.confrim_button);
 
+        confirmButton.setOnClickListener(view1 -> {
+            String date, textHours;
+            double hours = 0;
+            date = String.valueOf(dateEditText.getText());
+            textHours = String.valueOf(hourEditText.getText());
+
+            if (!textHours.isEmpty()) {
+                try {
+                    hours =  Double.parseDouble(textHours);
+                } catch (NumberFormatException e) {
+                    Log.e("CastError", "Casting error: " + e.getMessage(), e);
+                }
+            }
+            saveWorkHours(date, hours);
+
+            dateEditText.setText("");
+            hourEditText.setText("");
+        });
     }
+
+    private void saveWorkHours(String selectedDate, double hoursWorked) {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        String userId = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : null;
+
+        if (userId == null) {
+            Toast.makeText(getContext(), "User not authenticated", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        WorkLog workLog = new WorkLog(userId, selectedDate, hoursWorked);
+
+        db.collection("work_logs")
+                .add(workLog)
+                .addOnSuccessListener(documentReference -> Toast.makeText(getContext(), "Data saved", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+
+
+
+
 }

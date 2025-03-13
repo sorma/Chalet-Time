@@ -36,11 +36,19 @@
                 android:textSize="18sp" />
 
             <TextView
+                android:id="@+id/birthday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_recycler_grid"
+                android:text="Birthday" />
+
+            <TextView
                 android:id="@+id/hour"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_recycler_grid"
                 android:text="Ore di lavoro" />
+
 
         </LinearLayout>
 

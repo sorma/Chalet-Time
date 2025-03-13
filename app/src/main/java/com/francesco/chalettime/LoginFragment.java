@@ -16,6 +16,8 @@ import android.widget.Toast;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.Objects;
+
 public class LoginFragment extends Fragment {
 
     private TextInputEditText editTextEmail;
@@ -23,7 +25,6 @@ public class LoginFragment extends Fragment {
     FirebaseAuth mAuth;
 
     public LoginFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -34,7 +35,6 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
@@ -47,6 +47,11 @@ public class LoginFragment extends Fragment {
 
         Button loginButton = view.findViewById(R.id.login_button);
         loginButton.setOnClickListener(v -> {
+
+            if (!validateFields()) {
+                return;
+            }
+
             String email, password;
             email = String.valueOf(editTextEmail.getText());
             password = String.valueOf(editTextPassword.getText());
@@ -54,12 +59,12 @@ public class LoginFragment extends Fragment {
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            Toast.makeText(getContext(), "Account created", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "signInWithEmail:success", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(getContext(), MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                         } else {
-                            Toast.makeText(getContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "signInWithEmail:failure", Toast.LENGTH_SHORT).show();
                         }
                     });
         });
@@ -67,6 +72,22 @@ public class LoginFragment extends Fragment {
         Button textbutton = view.findViewById(R.id.textButton);
         textbutton.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_registerFragment));
 
+    }
+
+    private boolean validateFields() {
+        boolean isValid = true;
+
+        if (Objects.requireNonNull(editTextEmail.getText()).toString().trim().isEmpty()) {
+            editTextEmail.setError("Enter the e-mail");
+            return false;
+        }
+
+        if (Objects.requireNonNull(editTextPassword.getText()).toString().trim().isEmpty()) {
+            editTextPassword.setError("Insert the password");
+            return false;
+        }
+
+        return isValid;
     }
 
 }
