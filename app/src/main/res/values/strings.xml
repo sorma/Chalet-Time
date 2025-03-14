@@ -20,4 +20,9 @@
     <string name="surname">Surname</string>
     <string name="seleziona_ore">Selected hours</string>
     <string name="selected_gender">Selected gender</string>
+    <string name="selected_month">Selected month</string>
+    <string name="search">Search</string>
+    <string name="did_you_forget_your_password">Did you forget your password?</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

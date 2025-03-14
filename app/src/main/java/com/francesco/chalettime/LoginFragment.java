@@ -22,6 +22,7 @@ public class LoginFragment extends Fragment {
 
     private TextInputEditText editTextEmail;
     private TextInputEditText editTextPassword;
+    private String email, password;
     FirebaseAuth mAuth;
 
     public LoginFragment() {
@@ -52,7 +53,7 @@ public class LoginFragment extends Fragment {
                 return;
             }
 
-            String email, password;
+
             email = String.valueOf(editTextEmail.getText());
             password = String.valueOf(editTextPassword.getText());
 
@@ -72,6 +73,30 @@ public class LoginFragment extends Fragment {
         Button textbutton = view.findViewById(R.id.textButton);
         textbutton.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_registerFragment));
 
+        Button forgetButton = view.findViewById(R.id.forgetButton);
+
+        forgetButton.setOnClickListener(v -> {
+            String email = Objects.requireNonNull(editTextEmail.getText()).toString().trim();
+            if (email.isEmpty()) {
+                Toast.makeText(getContext(), "Please enter your email address", Toast.LENGTH_SHORT).show();
+            } else {
+                sendPasswordResetEmail(email);
+            }
+        });
+
+    }
+
+    private void sendPasswordResetEmail(String email) {
+        mAuth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Password reset email sent
+                        Toast.makeText(getContext(), "Password reset email sent", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Failed to send email
+                        Toast.makeText(getContext(), "Error: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private boolean validateFields() {
@@ -83,7 +108,7 @@ public class LoginFragment extends Fragment {
         }
 
         if (Objects.requireNonNull(editTextPassword.getText()).toString().trim().isEmpty()) {
-            editTextPassword.setError("Insert the password");
+            editTextPassword.setError("Enter the password");
             return false;
         }
 

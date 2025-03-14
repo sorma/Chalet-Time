@@ -2,6 +2,7 @@ package com.francesco.chalettime;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
@@ -21,19 +22,24 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class HomeFragment extends Fragment {
+
+    private FirebaseAuth mAuth;
 
 
     public HomeFragment() {
@@ -105,8 +111,6 @@ public class HomeFragment extends Fragment {
                 dateInputLayout.setEndIconVisible(!TextUtils.isEmpty(editable));
             }
         });
-
-
 
         return view;
     }
@@ -215,6 +219,15 @@ public class HomeFragment extends Fragment {
             dateEditText.setText("");
             hourEditText.setText("");
         });
+
+        ImageButton logoutButton = view.findViewById(R.id.logoutButton);
+        logoutButton.setOnClickListener(v -> {
+            mAuth = FirebaseAuth.getInstance();
+            mAuth.signOut();
+            Intent intent = new Intent(getContext(), WelcomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        });
     }
 
     private void saveWorkHours(String selectedDate, double hoursWorked) {
@@ -228,16 +241,37 @@ public class HomeFragment extends Fragment {
             return;
         }
 
-        WorkLog workLog = new WorkLog(userId, selectedDate, hoursWorked);
+        DocumentReference workLogRef = db.collection("work_logs").document(userId);
 
-        db.collection("work_logs")
-                .add(workLog)
-                .addOnSuccessListener(documentReference -> Toast.makeText(getContext(), "Data saved", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        WorkLog newEntry = new WorkLog(userId, selectedDate, hoursWorked);
+
+        workLogRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                List<WorkLog> currentLogs = Objects.requireNonNull(documentSnapshot.toObject(UserWorkLogs.class)).getLogs();
+
+                currentLogs.add(newEntry);
+
+                workLogRef.update("logs", currentLogs)
+                        .addOnSuccessListener(aVoid ->
+                                Toast.makeText(getContext(), "Data updated", Toast.LENGTH_SHORT).show())
+                        .addOnFailureListener(e ->
+                                Toast.makeText(getContext(), "Update failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            } else {
+                List<WorkLog> logs = new ArrayList<>();
+                logs.add(newEntry);
+
+                UserWorkLogs userWorkLogs = new UserWorkLogs(userId, logs);
+
+                workLogRef.set(userWorkLogs)
+                        .addOnSuccessListener(aVoid ->
+                                Toast.makeText(getContext(), "Data saved", Toast.LENGTH_SHORT).show())
+                        .addOnFailureListener(e ->
+                                Toast.makeText(getContext(), "Save failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        }).addOnFailureListener(e ->
+                Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+
     }
-
-
-
 
 
 }
