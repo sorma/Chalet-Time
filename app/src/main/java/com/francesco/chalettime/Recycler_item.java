@@ -1,6 +1,8 @@
 package com.francesco.chalettime;
 
-public class Recycler_item {
+import java.io.Serializable;
+
+public class Recycler_item implements Serializable {
     String name;
     String hours;
     int image;

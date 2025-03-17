@@ -14,8 +14,8 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-        /*
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        /*FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         Intent intent;
         if (currentUser != null) {
             intent = new Intent(this, MainActivity.class);

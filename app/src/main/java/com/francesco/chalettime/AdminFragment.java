@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,16 +29,16 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class AdminFragment extends Fragment {
+public class AdminFragment extends Fragment implements CustomRecyclerAdapter.OnItemClickListener {
 
     private CustomRecyclerAdapter adapter;
     private List<Recycler_item> userList;
-    private List<Recycler_item> filteredList;
     private int selectedMonth = -1;
     private FirebaseAuth mAuth;
+    private AutoCompleteTextView autoCompleteMonth;
+    private ArrayAdapter<String> monthAdapter;
 
-    public AdminFragment() {
-    }
+    public AdminFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,8 +46,7 @@ public class AdminFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_admin, container, false);
     }
 
@@ -59,8 +59,8 @@ public class AdminFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         userList = new ArrayList<>();
-        filteredList = new ArrayList<>();
         adapter = new CustomRecyclerAdapter(getContext(), userList);
+        adapter.setOnItemClickListener(this);
         recyclerView.setAdapter(adapter);
 
         fetchUsersFromFirestore();
@@ -68,8 +68,7 @@ public class AdminFragment extends Fragment {
         TextInputEditText searchEditText = view.findViewById(R.id.searchEditText);
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -77,26 +76,28 @@ public class AdminFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-            }
+            public void afterTextChanged(Editable s) {}
         });
 
-        AutoCompleteTextView autoCompleteMonth = view.findViewById(R.id.month);
+        autoCompleteMonth = view.findViewById(R.id.month);
+        String[] months = {"Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+                "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"};
 
-        String[] options = {"Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"};
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_dropdown_item_1line,
-                options
-        );
-
-        autoCompleteMonth.setAdapter(adapter);
+        monthAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, months);
+        autoCompleteMonth.setAdapter(monthAdapter);
 
         autoCompleteMonth.setOnItemClickListener((parent, view1, position, id) -> {
             selectedMonth = position + 1;
             fetchUsersFromFirestore();
         });
+
+        autoCompleteMonth.setOnClickListener(v -> autoCompleteMonth.showDropDown());
+
+        if (selectedMonth == -1) {
+            Calendar calendar = Calendar.getInstance();
+            selectedMonth = calendar.get(Calendar.MONTH) + 1;
+            autoCompleteMonth.setText(getMonthName(selectedMonth), false);
+        }
 
         ImageButton logoutButton = view.findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener(v -> {
@@ -107,11 +108,28 @@ public class AdminFragment extends Fragment {
             startActivity(intent);
         });
 
+
+    }
+
+
+    private String getMonthName(int month) {
+        String[] months = {"Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+                "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"};
+        return months[month - 1];
+    }
+
+    @Override
+    public void onItemClick(Recycler_item user) {
+        UserDetailsFragment detailsFragment = UserDetailsFragment.newInstance(user.getName(), selectedMonth);
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, detailsFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     private void fetchUsersFromFirestore() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        userList.clear();
+        List<Recycler_item> tempList = new ArrayList<>();
 
         db.collection("users")
                 .get()
@@ -125,30 +143,19 @@ public class AdminFragment extends Fragment {
                         String role = document.getString("role");
                         String gender = document.getString("gender");
 
-                        assert role != null;
-                        if (role.equals("user")) {
-                            int defaultImage;
+                        if ("user".equals(role)) {
+                            int defaultImage = (gender != null && gender.equals("Maschio")) ?
+                                    R.drawable.user_man : R.drawable.user_woman;
 
-                            assert gender != null;
-                            if (gender.equals("Maschio")) {
-                                defaultImage = R.drawable.user_man;
-                                fetchUserWorkHours(userId, nameSurname, defaultImage, birthday);
-                            } else {
-                                defaultImage = R.drawable.user_woman;
-                                fetchUserWorkHours(userId, nameSurname, defaultImage, birthday);
-                            }
-
+                            fetchUserWorkHours(userId, nameSurname, defaultImage, birthday, tempList);
                         }
                     }
-
-                    adapter.updateList(userList);
                 })
                 .addOnFailureListener(e -> Log.e("Firestore", "Errore nel recupero utenti", e));
     }
 
-    private void fetchUserWorkHours(String userId, String nameSurname, int defaultImage, String birthday) {
+    private void fetchUserWorkHours(String userId, String nameSurname, int defaultImage, String birthday, List<Recycler_item> tempList) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         Calendar calendar = Calendar.getInstance();
         int currentYear = calendar.get(Calendar.YEAR);
 
@@ -179,30 +186,29 @@ public class AdminFragment extends Fragment {
                             }
 
                             String hoursText = "Ore: " + totalHours;
-                            userList.add(new Recycler_item(nameSurname, hoursText, defaultImage, birthday));
-
-                            adapter.updateList(userList);
+                            tempList.add(new Recycler_item(nameSurname, hoursText, defaultImage, birthday));
                         }
                     }
+                    userList.clear();
+                    userList.addAll(tempList);
+                    adapter.updateList(new ArrayList<>(userList));
                 })
                 .addOnFailureListener(e -> Log.e("Firestore", "Errore nel recupero delle ore di lavoro", e));
     }
 
+
     private void filterUsers(String query) {
-        filteredList.clear();
+        List<Recycler_item> filteredList = new ArrayList<>();
 
         if (query.isEmpty()) {
             filteredList.addAll(userList);
         } else {
             for (Recycler_item user : userList) {
-                String name = user.getName();
-
-                if (name.toLowerCase().contains(query.toLowerCase())) {
+                if (user.getName().toLowerCase().contains(query.toLowerCase())) {
                     filteredList.add(user);
                 }
             }
         }
-
-        adapter.updateList(filteredList);
+        adapter.updateList(filteredList); // Aggiungi questa riga
     }
 }

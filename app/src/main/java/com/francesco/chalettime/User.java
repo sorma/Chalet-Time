@@ -20,7 +20,7 @@ public class User {
         this.gender = gender;
     }
 
-    // Getter e Setter
+    // Getter e Setterfragment
     public String getName() {
         return name;
     }

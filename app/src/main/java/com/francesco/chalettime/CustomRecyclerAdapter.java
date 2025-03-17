@@ -16,7 +16,16 @@ import java.util.List;
 public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAdapter.MyViewHolder> {
 
     private final Context context;
-    public List<Recycler_item> userList;
+    private List<Recycler_item> userList;
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onItemClick(Recycler_item user);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
 
     public CustomRecyclerAdapter(Context context, List<Recycler_item> userList) {
         this.context = context;
@@ -37,6 +46,12 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
         holder.nameView.setText(user.getName());
         holder.imageView.setImageResource(user.getImage());
         holder.birthadayView.setText(user.getBirthday());
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(user);
+            }
+        });
     }
 
     @Override
@@ -63,3 +78,4 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
         }
     }
 }
+
