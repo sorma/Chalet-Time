@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class UserDetailsFragment extends Fragment {
 
@@ -30,27 +32,27 @@ public class UserDetailsFragment extends Fragment {
     private TextView userNameTextView;
     private TextView birthdayTextView;
     private ImageView genderImageView;
-    private int selectedMonth; // Aggiungi questa variabile
+    private int selectedMonth;
 
     public UserDetailsFragment() {
         // Required empty public constructor
     }
 
-    public static UserDetailsFragment newInstance(String userName, int selectedMonth) {
-        UserDetailsFragment fragment = new UserDetailsFragment();
-        Bundle args = new Bundle();
-        args.putString("userName", userName);
-        args.putInt("selectedMonth", selectedMonth);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            userName = getArguments().getString("userName");
-            selectedMonth = getArguments().getInt("selectedMonth"); // Recupera selectedMonth
+        Bundle args = getArguments();
+        if (args != null) {
+            if (args.containsKey("userName") && args.containsKey("selectedMonth")) {
+                userName = args.getString("userName");
+                selectedMonth = args.getInt("selectedMonth");
+            } else {
+                Log.e("UserDetailsFragment", "Argomenti mancanti nel Bundle");
+            }
+        } else {
+            Log.e("UserDetailsFragment", "Bundle nullo");
         }
     }
 
@@ -64,6 +66,7 @@ public class UserDetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         workLogs = new ArrayList<>();
@@ -76,11 +79,10 @@ public class UserDetailsFragment extends Fragment {
         ImageButton backImageButton = view.findViewById(R.id.imageButton);
 
         backImageButton.setOnClickListener(view1 -> {
-            if (getActivity() != null) {
-                getActivity().getSupportFragmentManager().popBackStack();
-            }
+            Bundle args = new Bundle();
+            args.putInt("selectedMonth", selectedMonth);
+            Navigation.findNavController(view1).navigate(R.id.action_userDetailsFragment_to_adminFragment, args);
         });
-
         fetchUserDataAndWorkLogs();
     }
 

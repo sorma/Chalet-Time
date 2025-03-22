@@ -16,7 +16,8 @@ import android.widget.ImageButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,7 +29,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
 public class AdminFragment extends Fragment implements CustomRecyclerAdapter.OnItemClickListener {
 
     private CustomRecyclerAdapter adapter;
@@ -63,8 +63,6 @@ public class AdminFragment extends Fragment implements CustomRecyclerAdapter.OnI
         adapter.setOnItemClickListener(this);
         recyclerView.setAdapter(adapter);
 
-        fetchUsersFromFirestore();
-
         TextInputEditText searchEditText = view.findViewById(R.id.searchEditText);
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -86,18 +84,21 @@ public class AdminFragment extends Fragment implements CustomRecyclerAdapter.OnI
         monthAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, months);
         autoCompleteMonth.setAdapter(monthAdapter);
 
+        if (getArguments() != null && getArguments().containsKey("selectedMonth")) {
+            selectedMonth = getArguments().getInt("selectedMonth");
+        } else if (selectedMonth == -1) {
+            Calendar calendar = Calendar.getInstance();
+            selectedMonth = calendar.get(Calendar.MONTH) + 1;
+        }
+
+        autoCompleteMonth.setText(getMonthName(selectedMonth), false);
+
         autoCompleteMonth.setOnItemClickListener((parent, view1, position, id) -> {
             selectedMonth = position + 1;
             fetchUsersFromFirestore();
         });
 
         autoCompleteMonth.setOnClickListener(v -> autoCompleteMonth.showDropDown());
-
-        if (selectedMonth == -1) {
-            Calendar calendar = Calendar.getInstance();
-            selectedMonth = calendar.get(Calendar.MONTH) + 1;
-            autoCompleteMonth.setText(getMonthName(selectedMonth), false);
-        }
 
         ImageButton logoutButton = view.findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener(v -> {
@@ -108,7 +109,25 @@ public class AdminFragment extends Fragment implements CustomRecyclerAdapter.OnI
             startActivity(intent);
         });
 
+        fetchUsersFromFirestore();
 
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        String[] months = {"Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+                "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"};
+        monthAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, months);
+        autoCompleteMonth.setAdapter(monthAdapter);
+
+        if (selectedMonth == -1) {
+            Calendar calendar = Calendar.getInstance();
+            selectedMonth = calendar.get(Calendar.MONTH) + 1;
+            autoCompleteMonth.setText(getMonthName(selectedMonth), false);
+        }
+        fetchUsersFromFirestore();
     }
 
 
@@ -120,11 +139,16 @@ public class AdminFragment extends Fragment implements CustomRecyclerAdapter.OnI
 
     @Override
     public void onItemClick(Recycler_item user) {
-        UserDetailsFragment detailsFragment = UserDetailsFragment.newInstance(user.getName(), selectedMonth);
-        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, detailsFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        int selectedMonth = this.selectedMonth;
+        String userName = user.getName();
+
+        NavController navController = NavHostFragment.findNavController(this);
+
+        Bundle args = new Bundle();
+        args.putString("userName", userName);
+        args.putInt("selectedMonth", selectedMonth);
+
+        navController.navigate(R.id.action_adminFragment_to_userDetailsFragment, args);
     }
 
     private void fetchUsersFromFirestore() {
