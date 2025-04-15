@@ -1,4 +1,4 @@
-package com.francesco.chalettime;
+package com.francesco.chalettime.model;
 
 import java.util.List;
 
@@ -13,19 +13,9 @@ public class UserWorkLogs {
         this.logs = logs;
     }
 
-    public String getUserId() {
-        return userId;
-    }
 
     public List<WorkLog> getLogs() {
         return logs;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public void setLogs(List<WorkLog> logs) {
-        this.logs = logs;
-    }
 }

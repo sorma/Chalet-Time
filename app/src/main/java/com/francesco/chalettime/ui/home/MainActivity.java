@@ -1,4 +1,4 @@
-package com.francesco.chalettime;
+package com.francesco.chalettime.ui.home;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.francesco.chalettime.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 

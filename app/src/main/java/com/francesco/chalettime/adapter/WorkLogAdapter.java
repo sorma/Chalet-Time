@@ -1,5 +1,6 @@
-package com.francesco.chalettime;
+package com.francesco.chalettime.adapter;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,6 +8,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.francesco.chalettime.R;
+import com.francesco.chalettime.model.WorkLog;
 
 import java.util.List;
 
@@ -21,21 +25,17 @@ public class WorkLogAdapter extends RecyclerView.Adapter<WorkLogAdapter.WorkLogV
     @NonNull
     @Override
     public WorkLogViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_user_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.worklog_item, parent, false);
         return new WorkLogViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull WorkLogViewHolder holder, int position) {
-        WorkLog workLog = workLogs.get(position);
-        holder.dateTextView.setText(workLog.getDate());
-        holder.hoursTextView.setText(String.valueOf("Hours: " + workLog.getHours()));
+        holder.getDateTextView().setText(workLogs.get(position).getDate());
+        holder.getHoursTextView().setText("Hours: " + workLogs.get(position).getHours());
     }
 
-    @Override
-    public int getItemCount() {
-        return workLogs.size();
-    }
 
     public static class WorkLogViewHolder extends RecyclerView.ViewHolder {
         TextView dateTextView, hoursTextView;
@@ -45,5 +45,18 @@ public class WorkLogAdapter extends RecyclerView.Adapter<WorkLogAdapter.WorkLogV
             dateTextView = itemView.findViewById(R.id.date);
             hoursTextView = itemView.findViewById(R.id.hour);
         }
+
+        public TextView getDateTextView() {
+            return dateTextView;
+        }
+
+        public TextView getHoursTextView() {
+            return hoursTextView;
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return workLogs.size();
     }
 }

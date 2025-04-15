@@ -1,4 +1,4 @@
-package com.francesco.chalettime;
+package com.francesco.chalettime.ui.welcome.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
@@ -6,12 +6,6 @@ import android.content.Intent;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
-
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -24,11 +18,23 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
+import com.francesco.chalettime.R;
+import com.francesco.chalettime.model.User;
+import com.francesco.chalettime.data.repository.AuthRepository;
+import com.francesco.chalettime.data.repository.AuthRepositoryImpl;
+import com.francesco.chalettime.ui.home.MainActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.Objects;
 
 public class RegisterFragment extends Fragment {
@@ -39,8 +45,7 @@ public class RegisterFragment extends Fragment {
     private TextInputEditText editTextSurname;
     private TextInputEditText editTextDate;
     private AutoCompleteTextView autoCompleteGender;
-    FirebaseAuth mAuth;
-
+    private AuthRepository authRepository;
 
     public RegisterFragment() {
     }
@@ -48,13 +53,12 @@ public class RegisterFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        authRepository = new AuthRepositoryImpl();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_register, container, false);
 
         TextInputLayout dateInputLayout = view.findViewById(R.id.date_input_layout);
@@ -118,30 +122,23 @@ public class RegisterFragment extends Fragment {
             datePickerDialog.show();
         });
 
-
         autoCompleteGender = view.findViewById(R.id.gender);
-
         String[] options = {"Femmina", "Maschio"};
-
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 requireContext(),
                 android.R.layout.simple_dropdown_item_1line,
                 options
         );
-
         autoCompleteGender.setAdapter(adapter);
-
 
         editTextEmail = view.findViewById(R.id.e_mail);
         editTextPassword = view.findViewById(R.id.password);
         editTextName = view.findViewById(R.id.name);
         editTextSurname = view.findViewById(R.id.surname);
         editTextDate = view.findViewById(R.id.date);
-        mAuth = FirebaseAuth.getInstance();
 
         Button registerButton = view.findViewById(R.id.register_button);
         registerButton.setOnClickListener(v -> {
-
             if (!validateFields()) {
                 return;
             }
@@ -154,72 +151,67 @@ public class RegisterFragment extends Fragment {
             date = String.valueOf(editTextDate.getText());
             gender = String.valueOf(autoCompleteGender.getText());
 
-            mAuth.createUserWithEmailAndPassword(email, password)
+            authRepository.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                             if (user != null) {
+                                User newUser = new User(name, surname, date, email, (email.equals("admin@gmail.com") ? "admin" : "user"), gender);
+                                authRepository.saveUserToFirestore(user.getUid(), newUser, new AuthRepository.AuthCallback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Log.d("RegisterFragment", "Utente salvato su Firestore");
+                                        Toast.makeText(getContext(), "Registrazione avvenuta con successo!", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(getContext(), MainActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(intent);
+                                    }
 
-                                if(email.equals("admin@gmail.com"))
-                                    saveUserToFirestore(user.getUid(), name, surname, date, email, "admin", gender);
-                                else
-                                    saveUserToFirestore(user.getUid(), name, surname, date, email, "user", gender);
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        Log.e("RegisterFragment", "Errore nel salvataggio utente su Firestore: " + e.getMessage());
+                                        Toast.makeText(getContext(), "Registrazione fallita: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                             }
-                            Toast.makeText(getContext(), "signUpWithEmail:success", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(getContext(), MainActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
                         } else {
-                            Toast.makeText(getContext(), "signUpWithEmail:failure", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Registrazione fallita: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
-
         });
 
         Button textbutton = view.findViewById(R.id.textButton);
         textbutton.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.action_registerFragment_to_loginFragment));
     }
 
-    private void saveUserToFirestore(String userId, String name, String surname, String date, String email, String role, String gender) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        User user = new User(name, surname, date, email,role,gender);
-
-        db.collection("users").document(userId)
-                .set(user)
-                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Utente salvato con successo!"))
-                .addOnFailureListener(e -> Log.w("Firestore", "Errore nel salvataggio", e));
-    }
-
     private boolean validateFields() {
         boolean isValid = true;
 
         if (Objects.requireNonNull(editTextName.getText()).toString().trim().isEmpty()) {
-            editTextName.setError("Enter the name");
+            editTextName.setError("Inserisci il nome");
             return false;
         }
 
         if (Objects.requireNonNull(editTextSurname.getText()).toString().trim().isEmpty()) {
-            editTextSurname.setError("Enter the surname");
+            editTextSurname.setError("Inserisci il cognome");
             return false;
         }
 
         if (Objects.requireNonNull(editTextDate.getText()).toString().trim().isEmpty()) {
-            editTextDate.setError("Selected your birthday");
+            editTextDate.setError("Seleziona la tua data di nascita");
             return false;
         }
 
         if (Objects.requireNonNull(editTextEmail.getText()).toString().trim().isEmpty()) {
-            editTextEmail.setError("Enter the e-mail");
+            editTextEmail.setError("Inserisci l'e-mail");
             return false;
         }
 
         if (Objects.requireNonNull(editTextPassword.getText()).toString().trim().isEmpty()) {
-            editTextPassword.setError("Insert the password");
+            editTextPassword.setError("Inserisci la password");
             return false;
         }
 
         return isValid;
     }
-
 }

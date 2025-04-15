@@ -1,4 +1,4 @@
-package com.francesco.chalettime;
+package com.francesco.chalettime.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -7,14 +7,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.francesco.chalettime.R;
+
 import java.util.List;
 
-public class CustomGridAdapter extends BaseAdapter {
+public class HoursAdapter extends BaseAdapter {
     private final Context context;
     private final List<String> options;
     private int selectedPosition = -1;
 
-    public CustomGridAdapter(Context context, List<String> options) {
+    public HoursAdapter(Context context, List<String> options) {
         this.context = context;
         this.options = options;
     }
@@ -39,7 +42,7 @@ public class CustomGridAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.grid_item, parent, false);
+            convertView = LayoutInflater.from(context).inflate(R.layout.hours_item, parent, false);
             holder = new ViewHolder();
             holder.numberText = convertView.findViewById(R.id.numberText);
             convertView.setTag(holder);

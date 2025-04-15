@@ -1,4 +1,4 @@
-package com.francesco.chalettime;
+package com.francesco.chalettime.model;
 
 public class User {
     private String name;

@@ -15,7 +15,7 @@
         android:theme="@style/Base.Theme.ChaletTime"
         tools:targetApi="31">
         <activity
-            android:name=".WelcomeActivity"
+            android:name=".ui.welcome.WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,7 +26,7 @@
 
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.home.MainActivity"
             android:exported="true">
         </activity>
     </application>
