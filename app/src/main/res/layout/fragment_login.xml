@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.welcome.fragment.LoginFragment"
+    android:gravity="center">
+
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:contentDescription="@string/background_login"
+        android:src="@drawable/login_main" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin"
+        android:layout_marginTop="@dimen/margin"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:text="@string/welcome"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:text="@string/already_registered"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/e_mail"
+        android:layout_marginStart="@dimen/margin"
+        android:layout_marginEnd="@dimen/margin"
+        android:layout_marginTop="@dimen/margin"
+        style="?attr/textInputFilledStyle"
+        app:startIconDrawable="@drawable/e_mail"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/e_mail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/password"
+        android:layout_marginStart="@dimen/margin"
+        android:layout_marginEnd="@dimen/margin"
+        android:layout_marginTop="@dimen/margin"
+        app:endIconMode="password_toggle"
+        style="?attr/textInputFilledStyle"
+        app:startIconDrawable="@drawable/password"
+
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"/>
+
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/forgetButton"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:paddingTop="0dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginStart="@dimen/margin"
+        android:layout_marginEnd="@dimen/margin"
+        android:text="@string/did_you_forget_your_password" />
+
+    <Button
+        android:id="@+id/textButton"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginStart="@dimen/margin"
+        android:layout_marginEnd="@dimen/margin"
+        android:text="@string/you_are_not_registered_yet" />
+
+    <Button
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:id="@+id/login_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin"
+        android:layout_marginStart="@dimen/margin_button"
+        android:layout_marginEnd="@dimen/margin_button"
+        android:text="@string/login"
+        android:layout_gravity="center"
+        />
+
+</LinearLayout>

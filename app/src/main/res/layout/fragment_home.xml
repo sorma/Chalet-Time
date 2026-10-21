@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.welcome.fragment.LoginFragment"
+    android:gravity="center">
+
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:contentDescription="@string/background_login"
+        android:src="@drawable/login_main" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin"
+        android:layout_marginTop="@dimen/margin"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:text="@string/welcome"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:text="@string/sormani_francesco"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/date_input_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:hint="@string/select_date"
+        android:layout_marginStart="@dimen/margin"
+        android:layout_marginEnd="@dimen/margin"
+        android:layout_marginTop="@dimen/margin"
+        style="?attr/textInputFilledStyle"
+        app:startIconDrawable="@drawable/calendar"
+        app:endIconDrawable="@drawable/edit"
+        app:endIconMode="custom"
+        android:clickable="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/hourInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:hint="@string/insert_number_of_hours"
+        android:layout_marginStart="@dimen/margin"
+        android:layout_marginEnd="@dimen/margin"
+        android:layout_marginTop="@dimen/margin"
+        style="?attr/textInputFilledStyle"
+        app:startIconDrawable="@drawable/number"
+        app:endIconDrawable="@drawable/edit"
+        app:endIconMode="custom"
+        android:clickable="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/hour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:focusableInTouchMode="false"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <Button
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:id="@+id/confrim_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin"
+        android:layout_marginStart="@dimen/margin_button"
+        android:layout_marginEnd="@dimen/margin_button"
+        android:text="@string/confirm"
+        android:layout_gravity="center"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/margin">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+        <ImageButton
+            android:id="@+id/logoutButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/logout" />
+
+    </LinearLayout>
+
+
+
+
+</LinearLayout>

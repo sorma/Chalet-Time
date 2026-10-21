@@ -1,3 +1,28 @@
 <resources>
     <string name="app_name">ChaletTime</string>
+    <string name="welcome">Welcome!</string>
+    <string name="already_registered">Are you already registered?</string>
+    <string name="background_login">Background login fragment</string>
+    <string name="e_mail">E-mail</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="sormani_francesco">Sormani Francesco</string>
+    <string name="select_date">Select a date</string>
+    <string name="insert_number_of_hours">Insert number of hours</string>
+    <string name="confirm">Confirm</string>
+    <string name="you_are_not_registered_yet">You are not registered yet?</string>
+    <string name="do_you_want_to_register">Do you want to register?</string>
+    <string name="register">Register</string>
+    <string name="back_to_login">Back to login</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="name">Name</string>
+    <string name="surname">Surname</string>
+    <string name="seleziona_ore">Selected hours</string>
+    <string name="selected_gender">Selected gender</string>
+    <string name="selected_month">Selected month</string>
+    <string name="search">Search</string>
+    <string name="did_you_forget_your_password">Did you forget your password?</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
