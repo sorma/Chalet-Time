@@ -18,4 +18,5 @@ public class UserWorkLogs {
         return logs;
     }
 
+    public String getUserId() { return userId; }
 }

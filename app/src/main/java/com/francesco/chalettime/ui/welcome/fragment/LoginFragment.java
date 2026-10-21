@@ -14,8 +14,9 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.francesco.chalettime.R;
-import com.francesco.chalettime.data.repository.AuthRepository;
-import com.francesco.chalettime.data.repository.AuthRepositoryImpl;
+import androidx.lifecycle.ViewModelProvider;
+import com.francesco.chalettime.ui.welcome.viewmodel.AuthViewModel;
+
 import com.francesco.chalettime.ui.home.MainActivity;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -26,7 +27,7 @@ public class LoginFragment extends Fragment {
     private TextInputEditText editTextEmail;
     private TextInputEditText editTextPassword;
     private String email, password;
-    private AuthRepository authRepository;
+    private AuthViewModel viewModel;
 
     public LoginFragment() {
     }
@@ -34,7 +35,7 @@ public class LoginFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        authRepository = new AuthRepositoryImpl();
+        viewModel = new ViewModelProvider(this).get(AuthViewModel.class);
     }
 
     @Override
@@ -58,17 +59,24 @@ public class LoginFragment extends Fragment {
             email = String.valueOf(editTextEmail.getText());
             password = String.valueOf(editTextPassword.getText());
 
-            authRepository.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getContext(), "signInWithEmail:success", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(getContext(), MainActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                        } else {
-                            Toast.makeText(getContext(), "signInWithEmail:failure", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+            viewModel.login(email, password);
+        });
+
+        viewModel.getMessages().observe(getViewLifecycleOwner(), event -> {
+            String message = event.consume();
+            if (message != null) Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+        });
+        viewModel.getLoading().observe(getViewLifecycleOwner(), loading -> {
+            view.findViewById(R.id.login_button).setEnabled(!loading);
+            view.findViewById(R.id.textButton).setEnabled(!loading);
+            view.findViewById(R.id.forgetButton).setEnabled(!loading);
+            view.findViewById(R.id.progress).setVisibility(loading ? View.VISIBLE : View.GONE);
+        });
+        viewModel.getAuthenticated().observe(getViewLifecycleOwner(), event -> {
+            if (event.consume() == null) return;
+            Intent intent = new Intent(requireContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
         });
 
         Button textbutton = view.findViewById(R.id.textButton);
@@ -78,7 +86,7 @@ public class LoginFragment extends Fragment {
         forgetButton.setOnClickListener(v -> {
             String email = Objects.requireNonNull(editTextEmail.getText()).toString().trim();
             if (email.isEmpty()) {
-                Toast.makeText(getContext(), "Please enter your email address", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Inserisci il tuo indirizzo e-mail", Toast.LENGTH_SHORT).show();
             } else {
                 sendPasswordResetEmail(email);
             }
@@ -86,29 +94,27 @@ public class LoginFragment extends Fragment {
     }
 
     private void sendPasswordResetEmail(String email) {
-        authRepository.sendPasswordResetEmail(email)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(getContext(), "Password reset email sent", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getContext(), "Error: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+        viewModel.resetPassword(email);
     }
 
     private boolean validateFields() {
         boolean isValid = true;
 
         if (Objects.requireNonNull(editTextEmail.getText()).toString().trim().isEmpty()) {
-            editTextEmail.setError("Enter the e-mail");
+            editTextEmail.setError("Inserisci l’e-mail");
             return false;
         }
 
         if (Objects.requireNonNull(editTextPassword.getText()).toString().trim().isEmpty()) {
-            editTextPassword.setError("Enter the password");
+            editTextPassword.setError("Inserisci la password");
             return false;
         }
 
         return isValid;
+    }
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        editTextEmail = null;
+        editTextPassword = null;
     }
 }

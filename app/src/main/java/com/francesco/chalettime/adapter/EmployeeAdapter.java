@@ -5,7 +5,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -46,7 +45,9 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.MyView
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.getHourView().setText(userList.get(position).getHours());
         holder.getNameView().setText(userList.get(position).getName());
-        holder.getImageView().setImageResource(userList.get(position).getImage());
+        String gender = userList.get(position).getGender();
+        holder.genderView.setText(context.getString(R.string.gender_format,
+                gender == null || gender.trim().isEmpty() ? context.getString(R.string.gender_not_specified) : gender));
         holder.getBirthadayView().setText(userList.get(position).getBirthday());
 
         holder.itemView.setOnClickListener(v -> {
@@ -64,12 +65,7 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.MyView
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
-        TextView nameView, hourView, birthadayView;
-
-        public ImageView getImageView() {
-            return imageView;
-        }
+        TextView nameView, hourView, birthadayView, genderView;
 
         public TextView getNameView() {
             return nameView;
@@ -85,10 +81,10 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.MyView
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.imageView);
             nameView = itemView.findViewById(R.id.name);
             hourView = itemView.findViewById(R.id.hour);
             birthadayView = itemView.findViewById(R.id.birthday);
+            genderView = itemView.findViewById(R.id.genderLabel);
 
         }
     }

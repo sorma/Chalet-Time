@@ -1,18 +1,17 @@
 package com.francesco.chalettime.data.repository;
 
 import com.francesco.chalettime.model.User;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseUser;
 
+/** App-facing authentication contract, independent of the Firebase SDK. */
 public interface AuthRepository {
-    Task<AuthResult> signInWithEmailAndPassword(String email, String password);
-    Task<AuthResult> createUserWithEmailAndPassword(String email, String password);
-    Task<Void> sendPasswordResetEmail(String email);
+    String getCurrentUserId();
+    void signOut();
+    void signInWithEmailAndPassword(String email, String password, AuthCallback callback);
+    void createUserWithEmailAndPassword(String email, String password, AuthCallback callback);
+    void sendPasswordResetEmail(String email, AuthCallback callback);
     void saveUserToFirestore(String userId, User user, AuthCallback callback);
-
     interface AuthCallback {
         void onSuccess();
-        void onFailure(Exception e);
+        void onFailure(Exception error);
     }
 }

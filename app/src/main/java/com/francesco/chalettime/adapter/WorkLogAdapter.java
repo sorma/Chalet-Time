@@ -33,7 +33,7 @@ public class WorkLogAdapter extends RecyclerView.Adapter<WorkLogAdapter.WorkLogV
     @Override
     public void onBindViewHolder(@NonNull WorkLogViewHolder holder, int position) {
         holder.getDateTextView().setText(workLogs.get(position).getDate());
-        holder.getHoursTextView().setText("Hours: " + workLogs.get(position).getHours());
+        holder.getHoursTextView().setText(holder.itemView.getContext().getString(R.string.hours_format, workLogs.get(position).getHours()));
     }
 
 

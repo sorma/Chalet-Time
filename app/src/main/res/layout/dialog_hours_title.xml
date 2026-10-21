@@ -1,19 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- res/layout/dialog_title_centered.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center"
-    android:padding="@dimen/padding"
-    android:background="@color/md_theme_secondary">
-
-    <TextView
-        android:id="@+id/dialog_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/seleziona_ore"
-        android:textSize="25sp"
-        android:textColor="@android:color/white"
-        android:textStyle="bold" />
-</LinearLayout>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/dialog_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="24dp" android:text="@string/seleziona_ore" android:textAppearance="@style/TextAppearance.Material3.TitleLarge" android:textColor="?attr/colorOnSurface"/>

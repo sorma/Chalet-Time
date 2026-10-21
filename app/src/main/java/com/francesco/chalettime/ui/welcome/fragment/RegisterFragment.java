@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,15 +24,12 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.francesco.chalettime.R;
-import com.francesco.chalettime.model.User;
-import com.francesco.chalettime.data.repository.AuthRepository;
-import com.francesco.chalettime.data.repository.AuthRepositoryImpl;
+import androidx.lifecycle.ViewModelProvider;
+import com.francesco.chalettime.ui.welcome.viewmodel.AuthViewModel;
+
 import com.francesco.chalettime.ui.home.MainActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
 
@@ -45,7 +41,7 @@ public class RegisterFragment extends Fragment {
     private TextInputEditText editTextSurname;
     private TextInputEditText editTextDate;
     private AutoCompleteTextView autoCompleteGender;
-    private AuthRepository authRepository;
+    private AuthViewModel viewModel;
 
     public RegisterFragment() {
     }
@@ -53,7 +49,7 @@ public class RegisterFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        authRepository = new AuthRepositoryImpl();
+        viewModel = new ViewModelProvider(this).get(AuthViewModel.class);
     }
 
     @Override
@@ -100,6 +96,7 @@ public class RegisterFragment extends Fragment {
         Calendar calendar = Calendar.getInstance();
         EditText dateEditText = view.findViewById(R.id.date);
 
+        ((TextInputLayout)view.findViewById(R.id.date_input_layout)).setEndIconOnClickListener(v -> dateEditText.performClick());
         dateEditText.setOnClickListener(v -> {
             int year = calendar.get(Calendar.YEAR);
             int month = calendar.get(Calendar.MONTH);
@@ -151,33 +148,23 @@ public class RegisterFragment extends Fragment {
             date = String.valueOf(editTextDate.getText());
             gender = String.valueOf(autoCompleteGender.getText());
 
-            authRepository.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                            if (user != null) {
-                                User newUser = new User(name, surname, date, email, (email.equals("admin@gmail.com") ? "admin" : "user"), gender);
-                                authRepository.saveUserToFirestore(user.getUid(), newUser, new AuthRepository.AuthCallback() {
-                                    @Override
-                                    public void onSuccess() {
-                                        Log.d("RegisterFragment", "Utente salvato su Firestore");
-                                        Toast.makeText(getContext(), "Registrazione avvenuta con successo!", Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(getContext(), MainActivity.class);
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        startActivity(intent);
-                                    }
+            viewModel.register(email, password, name, surname, date, gender);
+        });
 
-                                    @Override
-                                    public void onFailure(Exception e) {
-                                        Log.e("RegisterFragment", "Errore nel salvataggio utente su Firestore: " + e.getMessage());
-                                        Toast.makeText(getContext(), "Registrazione fallita: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        } else {
-                            Toast.makeText(getContext(), "Registrazione fallita: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
+        viewModel.getMessages().observe(getViewLifecycleOwner(), event -> {
+            String message = event.consume();
+            if (message != null) Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+        });
+        viewModel.getLoading().observe(getViewLifecycleOwner(), loading -> {
+            view.findViewById(R.id.register_button).setEnabled(!loading);
+            view.findViewById(R.id.textButton).setEnabled(!loading);
+            view.findViewById(R.id.progress).setVisibility(loading ? View.VISIBLE : View.GONE);
+        });
+        viewModel.getAuthenticated().observe(getViewLifecycleOwner(), event -> {
+            if (event.consume() == null) return;
+            Intent intent = new Intent(requireContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
         });
 
         Button textbutton = view.findViewById(R.id.textButton);
@@ -213,5 +200,14 @@ public class RegisterFragment extends Fragment {
         }
 
         return isValid;
+    }
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        editTextEmail = null;
+        editTextPassword = null;
+        editTextName = null;
+        editTextSurname = null;
+        editTextDate = null;
+        autoCompleteGender = null;
     }
 }

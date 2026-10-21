@@ -1,7 +1,6 @@
 package com.francesco.chalettime.data.repository;
 
 import com.francesco.chalettime.data.datasource.FirebaseUserDetailsDataSource;
-import com.francesco.chalettime.model.User;
 
 public class UserDetailsRepositoryImpl implements UserDetailsRepository {
 

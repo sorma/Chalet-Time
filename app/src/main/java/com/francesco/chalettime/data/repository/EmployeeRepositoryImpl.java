@@ -1,10 +1,7 @@
 package com.francesco.chalettime.data.repository;
 
 import com.francesco.chalettime.data.datasource.FirebaseEmployeeDataSource;
-import com.francesco.chalettime.model.Employee;
-import com.francesco.chalettime.model.UserWorkLogs;
 
-import java.util.List;
 
 public class EmployeeRepositoryImpl implements EmployeeRepository {
 

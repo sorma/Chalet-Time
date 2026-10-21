@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,16 +23,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import com.francesco.chalettime.ui.home.viewmodel.HomeViewModel;
 
 import com.francesco.chalettime.R;
 import com.francesco.chalettime.adapter.HoursAdapter;
-import com.francesco.chalettime.data.repository.UserWorkLogRepository;
-import com.francesco.chalettime.data.repository.UserWorkLogRepositoryImpl;
-import com.francesco.chalettime.model.WorkLog;
 import com.francesco.chalettime.ui.welcome.WelcomeActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +38,7 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-    private FirebaseAuth mAuth;
-    private UserWorkLogRepository workLogRepository; // Nuovo repository
+    private HomeViewModel viewModel;
 
     public HomeFragment() {
     }
@@ -50,13 +46,12 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        workLogRepository = new UserWorkLogRepositoryImpl(); // Inizializza il repository
+        viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // ... (il tuo codice onCreateView rimane simile)
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         TextInputLayout hourInputLayout = view.findViewById(R.id.hourInputLayout);
         TextInputEditText hourEditText = view.findViewById(R.id.hour);
@@ -82,6 +77,9 @@ public class HomeFragment extends Fragment {
         Calendar calendar = Calendar.getInstance();
         EditText hourEditText = view.findViewById(R.id.hour);
         EditText dateEditText = view.findViewById(R.id.date);
+
+        ((TextInputLayout)view.findViewById(R.id.date_input_layout)).setEndIconOnClickListener(v -> dateEditText.performClick());
+        ((TextInputLayout)view.findViewById(R.id.hourInputLayout)).setEndIconOnClickListener(v -> hourEditText.performClick());
 
         dateEditText.setOnClickListener(v -> {
             int year = calendar.get(Calendar.YEAR);
@@ -123,7 +121,7 @@ public class HomeFragment extends Fragment {
             dialogGridView.setAdapter(adapter);
             dialogGridView.setOnItemClickListener((parent, a, position, id) -> {
                 String selectedOption = options.get(position);
-                titleTextView.setText("Selected: " + selectedOption);
+                titleTextView.setText(getString(R.string.hours_selected, selectedOption));
                 adapter.setSelectedPosition(position);
             });
             okButton.setOnClickListener(v1 -> {
@@ -142,50 +140,28 @@ public class HomeFragment extends Fragment {
 
         Button confirmButton = view.findViewById(R.id.confrim_button);
         confirmButton.setOnClickListener(view1 -> {
-            String date = String.valueOf(dateEditText.getText());
-            String textHours = String.valueOf(hourEditText.getText());
-            double hours = 0;
-            if (!textHours.isEmpty()) {
-                try {
-                    hours = Double.parseDouble(textHours);
-                } catch (NumberFormatException e) {
-                    Log.e("CastError", "Casting error: " + e.getMessage(), e);
-                }
-            }
-            saveWorkHours(date, hours);
-            dateEditText.setText("");
-            hourEditText.setText("");
+            viewModel.save(dateEditText.getText().toString(), hourEditText.getText().toString());
+        });
+
+        viewModel.getMessages().observe(getViewLifecycleOwner(), event -> {
+            String message = event.consume();
+            if (message != null) Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+        });
+        viewModel.getLoading().observe(getViewLifecycleOwner(), loading -> {
+            confirmButton.setEnabled(!loading);
+            view.findViewById(R.id.progress).setVisibility(loading ? View.VISIBLE : View.GONE);
+        });
+        viewModel.getSaved().observe(getViewLifecycleOwner(), event -> {
+            if (event.consume() != null) { dateEditText.setText(""); hourEditText.setText(""); }
         });
 
         ImageButton logoutButton = view.findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener(v -> {
-            mAuth = FirebaseAuth.getInstance();
-            mAuth.signOut();
+            viewModel.logout();
             Intent intent = new Intent(getContext(), WelcomeActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
     }
 
-    private void saveWorkHours(String selectedDate, double hoursWorked) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
-
-        if (userId == null) {
-            Toast.makeText(getContext(), "Utente non autenticato", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        WorkLog workLog = new WorkLog(userId, selectedDate, hoursWorked);
-        workLogRepository.saveWorkLog(userId, workLog, new UserWorkLogRepository.SaveWorkLogCallback() {
-            @Override
-            public void onSuccess(String message) {
-                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure(String errorMessage) {
-                Toast.makeText(getContext(), "Errore nel salvataggio: " + errorMessage, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 }

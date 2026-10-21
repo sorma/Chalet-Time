@@ -6,14 +6,14 @@ public class Employee implements Serializable {
     private String userId; // Aggiunto l'ID dell'utente
     private String name;
     private String hours;
-    private int image;
+    private String gender;
     private String birthday;
 
-    public Employee(String userId, String name, String hours, int image, String birthday) {
+    public Employee(String userId, String name, String hours, String gender, String birthday) {
         this.userId = userId;
         this.name = name;
         this.hours = hours;
-        this.image = image;
+        this.gender = gender;
         this.birthday = birthday;
     }
 
@@ -37,8 +37,8 @@ public class Employee implements Serializable {
         this.hours = hours;
     }
 
-    public int getImage() {
-        return image;
+    public String getGender() {
+        return gender;
     }
 
     // Potresti aggiungere dei setter se necessario

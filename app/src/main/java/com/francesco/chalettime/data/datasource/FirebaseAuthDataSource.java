@@ -9,6 +9,11 @@ import android.util.Log;
 
 public class FirebaseAuthDataSource {
 
+    public String getCurrentUserId() {
+        return firebaseAuth.getCurrentUser() == null ? null : firebaseAuth.getCurrentUser().getUid();
+    }
+    public void signOut() { firebaseAuth.signOut(); }
+
     private final FirebaseAuth firebaseAuth;
     private final FirebaseFirestore firestore;
 

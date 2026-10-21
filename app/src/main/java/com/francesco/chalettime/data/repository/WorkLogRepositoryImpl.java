@@ -1,9 +1,6 @@
 package com.francesco.chalettime.data.repository;
 
 import com.francesco.chalettime.data.datasource.FirebaseWorkLogDataSource;
-import com.francesco.chalettime.model.WorkLog;
-import java.util.List;
-import java.util.Calendar;
 
 public class WorkLogRepositoryImpl implements WorkLogRepository {
 

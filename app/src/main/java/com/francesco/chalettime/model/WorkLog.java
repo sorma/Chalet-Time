@@ -26,4 +26,5 @@ public class WorkLog {
         return hours;
     }
 
+    public String getUserId() { return userId; }
 }

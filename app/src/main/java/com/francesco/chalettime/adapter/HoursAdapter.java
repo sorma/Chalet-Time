@@ -1,7 +1,7 @@
 package com.francesco.chalettime.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
+import com.google.android.material.color.MaterialColors;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,10 +54,10 @@ public class HoursAdapter extends BaseAdapter {
         holder.numberText.setText(option);
 
         if (position == selectedPosition) {
-            holder.numberText.setTextColor(Color.WHITE);
+            holder.numberText.setTextColor(MaterialColors.getColor(holder.numberText, com.google.android.material.R.attr.colorOnPrimary));
             holder.numberText.setBackgroundResource(R.drawable.circle_selector);
         } else {
-            holder.numberText.setTextColor(Color.BLACK);
+            holder.numberText.setTextColor(MaterialColors.getColor(holder.numberText, com.google.android.material.R.attr.colorOnSurface));
             holder.numberText.setBackgroundResource(0);
         }
 

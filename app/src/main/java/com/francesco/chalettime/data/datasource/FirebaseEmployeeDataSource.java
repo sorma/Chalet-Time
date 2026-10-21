@@ -2,16 +2,13 @@ package com.francesco.chalettime.data.datasource;
 
 import android.util.Log;
 
-import com.francesco.chalettime.R;
 import com.francesco.chalettime.data.repository.EmployeeRepository;
 import com.francesco.chalettime.model.Employee;
 import com.francesco.chalettime.model.UserWorkLogs;
-import com.francesco.chalettime.model.WorkLog;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class FirebaseEmployeeDataSource {
@@ -37,9 +34,7 @@ public class FirebaseEmployeeDataSource {
                         String gender = document.getString("gender");
 
                         if ("user".equals(role)) {
-                            int defaultImage = (gender != null && gender.equals("Maschio")) ?
-                                    R.drawable.user_man : R.drawable.user_woman;
-                            tempList.add(new Employee(userId, nameSurname, "", defaultImage, birthday)); // Aggiungiamo userId
+                            tempList.add(new Employee(userId, nameSurname, "", gender, birthday));
                         }
                     }
                     callback.onSuccess(tempList);
